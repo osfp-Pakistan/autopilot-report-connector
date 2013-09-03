@@ -32,6 +32,51 @@ import net.minidev.json.JSONValue;
     static int calls = 0, finished_calls = 0;
     static String url = null;
       
+    public static void main(String[] args)
+    {
+      try
+      {
+        Properties properties = new Properties();
+        properties.load(new BufferedInputStream(new FileInputStream("rest-api.config")));
+        url = properties.getProperty("url", "autopilot-rest-api/");
+        
+        JSONObject datas = (JSONObject) JSONValue.parse(new FileReader("./querys.config"));
+        JSONArray querys = (JSONArray) datas.get("querys");
+             
+        calls = querys.size();
+            
+        for (int i = 0; i < querys.size(); i++)
+        {
+          JSONObject query = (JSONObject) querys.get(i);
+          all_data.add("");
+          all_fors_finished.add(0);
+          ServerRequest(query,i);
+        }
+      }
+      catch(IOException e)
+      {
+        System.out.println(e.toString());
+      }
+      catch(ClassCastException e)
+      {
+        System.out.println(e.toString());
+      }
+    }
+        
+    public static void ServerRequest(JSONObject query, int position)
+    {
+      String[][] args = new String[query.keySet().size()][2];
+      int i = 0;
+      
+      for (Map.Entry<String, Object> element : query.entrySet())
+      {
+        args[i][0] = element.getKey();
+        args[i][1] = (String) element.getValue();
+        i++;
+      }
+      run(args, position);	
+    }
+    
     private static void run(String[][] args, int position)
     {      
       try
@@ -91,51 +136,6 @@ import net.minidev.json.JSONValue;
       {
         System.out.println(e.toString());
       }
-    }
-     
-    public static void main(String[] args)
-    {
-      try
-      {
-        Properties properties = new Properties();
-        properties.load(new BufferedInputStream(new FileInputStream("rest-api.config")));
-        url = properties.getProperty("url", "autopilot-rest-api/");
-        
-        JSONObject datas = (JSONObject) JSONValue.parse(new FileReader("./querys.config"));
-        JSONArray querys = (JSONArray) datas.get("querys");
-             
-        calls = querys.size();
-            
-        for (int i = 0; i < querys.size(); i++)
-        {
-          JSONObject query = (JSONObject) querys.get(i);
-          all_data.add("");
-          all_fors_finished.add(0);
-          ServerRequest(query,i);
-        }
-      }
-      catch(IOException e)
-      {
-        System.out.println(e.toString());
-      }
-      catch(ClassCastException e)
-      {
-        System.out.println(e.toString());
-      }
-    }
-        
-    public static void ServerRequest(JSONObject query, int position)
-    {
-      String[][] args = new String[query.keySet().size()][2];
-      int i = 0;
-        
-      for (Map.Entry<String, Object> element : query.entrySet())
-      {
-        args[i][0] = element.getKey();
-        args[i][1] = (String) element.getValue();
-        i++;
-      }
-      run(args, position);	
     }
         
     public static void For_Finished(int position)
